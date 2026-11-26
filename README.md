@@ -38,6 +38,12 @@ Latest run (gpt-4o-mini):
 | Tokens for all 17 reviews | about 12,000 (well under 1p) |
 | Time per review | about 4 seconds |
 
+## Live demo
+
+[Ositau/azure-openai-policy-assistant#1](https://github.com/Ositau/azure-openai-policy-assistant/pull/1) looks like a tidy-up: "upgrade AI Search to Basic and enable API keys for testing". The reviewer rated it **HIGH**: changing the search tier destroys and recreates the service (and its index), six role assignments are recreated with it, the new tier costs more, and API keys are switched on for Azure OpenAI. The check failed until someone accepts the risk. The pull request was never merged.
+
+The demo workflow plans with a read-only identity: Reader on the resource group, Storage Blob Data Reader on the Terraform state and Cognitive Services OpenAI User. So it runs `terraform plan -refresh=false -lock=false`: no key access, and nothing written to the state.
+
 ## Use it
 
 ### Locally

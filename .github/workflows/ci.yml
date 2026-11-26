@@ -38,6 +38,8 @@ jobs:
               - 'reviewer/**'
               - 'eval/**'
               - 'requirements.txt'
+              - 'pytest.ini'
+              - '.github/workflows/ci.yml'
 
   evaluate:
     needs: [unit, changes]

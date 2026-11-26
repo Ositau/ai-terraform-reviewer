@@ -9,3 +9,4 @@ review.json
 *.tfstate
 *.tfstate.*
 *.tfvars
+.gh-vars.json
