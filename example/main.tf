@@ -35,7 +35,7 @@ resource "azurerm_storage_account" "data" {
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
-  allow_nested_items_to_be_public = false
+  allow_nested_items_to_be_public = true # so we can share files with the supplier
   shared_access_key_enabled       = false
 }
 
@@ -54,6 +54,21 @@ resource "azurerm_network_security_rule" "https" {
   source_port_range           = "*"
   destination_port_range      = "443"
   source_address_prefix       = "AzureFrontDoor.Backend"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.demo.name
+  network_security_group_name = azurerm_network_security_group.web.name
+}
+
+# Temporary: let the team SSH in to debug the web servers.
+resource "azurerm_network_security_rule" "ssh_debug" {
+  name                        = "allow-ssh-debug"
+  priority                    = 110
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "22"
+  source_address_prefix       = "*"
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.demo.name
   network_security_group_name = azurerm_network_security_group.web.name
