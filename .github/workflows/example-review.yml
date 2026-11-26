@@ -1,0 +1,47 @@
+# Try the reviewer on the example in example/: open a pull request that changes example/main.tf.
+# The plan is never applied. The identity only needs "Cognitive Services OpenAI User" on the
+# Azure OpenAI resource: planning brand-new resources makes no calls to Azure.
+name: example-review
+
+on:
+  pull_request:
+    paths: ["example/**", ".github/workflows/example-review.yml"]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  id-token: write        # OIDC sign-in to Azure, no secrets
+  pull-requests: write   # post the review comment
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.7
+          terraform_wrapper: false
+
+      - name: Terraform plan
+        run: |
+          terraform -chdir=example init -input=false
+          terraform -chdir=example plan -input=false -out=tfplan
+          terraform -chdir=example show -json tfplan > plan.json
+
+      - uses: ./
+        with:
+          plan-json: plan.json
+          azure-openai-endpoint: ${{ vars.AZURE_OPENAI_ENDPOINT }}

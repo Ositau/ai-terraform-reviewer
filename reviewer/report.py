@@ -74,6 +74,6 @@ def markdown(r: Result, cost_gbp: float | None = None) -> str:
         foot += f" Model: {r.ai.model}, {r.ai.prompt_tokens + r.ai.completion_tokens} tokens"
         foot += f" (about £{cost_gbp:.4f})." if cost_gbp is not None else "."
     else:
-        foot += " AI review was not available for this run, so only the safety checks are shown."
+        foot += " The AI review was switched off or unavailable for this run, so only the safety checks are shown."
     lines.append(f"<sub>{foot}</sub>")
     return "\n".join(lines)

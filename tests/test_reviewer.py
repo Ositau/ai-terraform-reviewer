@@ -102,7 +102,7 @@ def test_comment_has_marker_counts_and_approval_line():
     assert md.startswith(MARKER)
     assert "0 to create, 0 to update, 0 to replace, 1 to delete" in md
     assert "needs explicit approval" in md
-    assert "AI review was not available" in md
+    assert "switched off or unavailable" in md
 
 
 def test_empty_plan_is_low_risk(tmp_path):
@@ -128,4 +128,4 @@ def test_ai_failure_falls_back_to_rules(monkeypatch, tmp_path):
     monkeypatch.setattr(ai, "review", boom)
     out = tmp_path / "review.md"
     code = cli.main([str(CASES / "nsg-ssh-from-internet.json"), "--out", str(out)])
-    assert code == 2 and "AI review was not available" in out.read_text(encoding="utf-8")
+    assert code == 2 and "switched off or unavailable" in out.read_text(encoding="utf-8")

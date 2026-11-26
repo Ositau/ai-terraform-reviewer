@@ -10,3 +10,5 @@ review.json
 *.tfstate.*
 *.tfvars
 .gh-vars.json
+plan.json
+example/.terraform/
