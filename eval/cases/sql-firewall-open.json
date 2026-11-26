@@ -1,0 +1,30 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_mssql_firewall_rule.everyone",
+   "mode": "managed",
+   "type": "azurerm_mssql_firewall_rule",
+   "name": "everyone",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "before": null,
+    "after": {
+     "name": "allow-all",
+     "server_id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-shop-prod/providers/Microsoft.Sql/servers/sql-shop-prod",
+     "start_ip_address": "0.0.0.0",
+     "end_ip_address": "255.255.255.255"
+    },
+    "after_unknown": {
+     "id": true
+    },
+    "before_sensitive": false,
+    "after_sensitive": {}
+   }
+  }
+ ]
+}

@@ -1,0 +1,91 @@
+name: AI Terraform plan review
+description: >
+  Reviews a Terraform plan with fixed safety checks and Azure OpenAI, posts the result as a
+  pull request comment, and fails the check when the risk is high (unless an approval label is set).
+  Sign in to Azure with azure/login (OIDC) before this step. No API keys are used.
+
+inputs:
+  plan-json:
+    description: Path to the plan JSON (terraform show -json tfplan > plan.json)
+    required: true
+  azure-openai-endpoint:
+    description: Azure OpenAI endpoint, e.g. https://my-openai.openai.azure.com/
+    required: true
+  azure-openai-deployment:
+    description: Chat model deployment name
+    default: gpt-4o-mini
+  fail-on:
+    description: Fail the check at this risk level (medium, high or never)
+    default: high
+  approval-label:
+    description: A pull request label that lets a high-risk change through once someone with write access has added it
+    default: risk-accepted
+  comment:
+    description: Post the review as a pull request comment (true/false)
+    default: "true"
+
+outputs:
+  risk:
+    description: low, medium or high
+    value: ${{ steps.review.outputs.risk }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install reviewer
+      shell: bash
+      run: pip install -q -r "${{ github.action_path }}/requirements.txt"
+
+    - name: Review plan
+      id: review
+      shell: bash
+      env:
+        AZURE_OPENAI_ENDPOINT: ${{ inputs.azure-openai-endpoint }}
+        AZURE_OPENAI_DEPLOYMENT: ${{ inputs.azure-openai-deployment }}
+        PYTHONPATH: ${{ github.action_path }}
+      run: |
+        set +e
+        python -m reviewer "${{ inputs.plan-json }}" --out review.md --json review.json --fail-on never > /dev/null
+        code=$?
+        set -e
+        if [ $code -ne 0 ]; then echo "Reviewer failed"; exit $code; fi
+        risk=$(python -c "import json;print(json.load(open('review.json'))['risk'])")
+        echo "risk=$risk" >> "$GITHUB_OUTPUT"
+        cat review.md >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Post or update the pull request comment
+      if: inputs.comment == 'true' && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const body = fs.readFileSync('review.md', 'utf8');
+          const marker = '<!-- ai-terraform-reviewer -->';
+          const { owner, repo } = context.repo;
+          const issue_number = context.issue.number;
+          const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+          const mine = comments.find(c => c.body && c.body.startsWith(marker));
+          if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+          else await github.rest.issues.createComment({ owner, repo, issue_number, body });
+
+    - name: Stop if the risk is too high
+      shell: bash
+      env:
+        RISK: ${{ steps.review.outputs.risk }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        APPROVAL: ${{ inputs.approval-label }}
+      run: |
+        order="low medium high"
+        rank() { i=0; for l in $order; do [ "$l" = "$1" ] && echo $i; i=$((i+1)); done; }
+        if [ "$FAIL_ON" = "never" ] || [ "$(rank "$RISK")" -lt "$(rank "$FAIL_ON")" ]; then exit 0; fi
+        if echo "$LABELS" | grep -q "\"$APPROVAL\""; then
+          echo "Risk is $RISK, accepted with the '$APPROVAL' label."
+          exit 0
+        fi
+        echo "::error::Plan risk is $RISK. Review the comment, then add the '$APPROVAL' label to accept it."
+        exit 1

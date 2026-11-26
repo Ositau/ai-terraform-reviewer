@@ -1,0 +1,31 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_role_assignment.ci",
+   "mode": "managed",
+   "type": "azurerm_role_assignment",
+   "name": "ci",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "before": null,
+    "after": {
+     "scope": "/subscriptions/00000000-0000-0000-0000-000000000000",
+     "role_definition_name": "Owner",
+     "principal_id": "11111111-1111-1111-1111-111111111111",
+     "principal_type": "ServicePrincipal"
+    },
+    "after_unknown": {
+     "id": true,
+     "role_definition_id": true
+    },
+    "before_sensitive": false,
+    "after_sensitive": {}
+   }
+  }
+ ]
+}

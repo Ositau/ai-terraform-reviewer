@@ -1,0 +1,64 @@
+# Tests for the reviewer itself.
+# - Unit tests run on every push and pull request (no Azure needed).
+# - The evaluation runs the 17 example plans through the real model whenever the prompt, rules,
+#   cases or model settings change. If a single case fails, the change can't be merged.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write   # OIDC sign-in to Azure for the evaluation, no secrets stored
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -r requirements.txt pytest
+      - run: pytest -q tests
+
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      eval: ${{ steps.filter.outputs.eval }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            eval:
+              - 'reviewer/**'
+              - 'eval/**'
+              - 'requirements.txt'
+
+  evaluate:
+    needs: [unit, changes]
+    if: needs.changes.outputs.eval == 'true'
+    runs-on: ubuntu-latest
+    environment: evaluation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -r requirements.txt
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+      - name: Run the evaluation set against Azure OpenAI
+        env:
+          AZURE_OPENAI_ENDPOINT: ${{ vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_DEPLOYMENT: ${{ vars.AZURE_OPENAI_DEPLOYMENT }}
+        run: python eval/run_eval.py | tee eval-results.txt
+      - run: cat eval-results.txt >> "$GITHUB_STEP_SUMMARY"
+        if: always()

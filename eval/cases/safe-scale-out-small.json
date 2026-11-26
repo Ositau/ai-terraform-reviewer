@@ -1,0 +1,39 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_linux_virtual_machine_scale_set.api",
+   "mode": "managed",
+   "type": "azurerm_linux_virtual_machine_scale_set",
+   "name": "api",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "update"
+    ],
+    "before": {
+     "name": "vmss-api",
+     "sku": "Standard_B2s",
+     "instances": 2,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after": {
+     "name": "vmss-api",
+     "sku": "Standard_B2s",
+     "instances": 3,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after_unknown": {},
+    "before_sensitive": {},
+    "after_sensitive": {}
+   }
+  }
+ ]
+}

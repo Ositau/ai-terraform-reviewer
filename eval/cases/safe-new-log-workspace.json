@@ -1,0 +1,40 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_log_analytics_workspace.main",
+   "mode": "managed",
+   "type": "azurerm_log_analytics_workspace",
+   "name": "main",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "create"
+    ],
+    "before": null,
+    "after": {
+     "name": "log-shop-prod",
+     "resource_group_name": "rg-shop-prod",
+     "location": "uksouth",
+     "sku": "PerGB2018",
+     "retention_in_days": 30,
+     "daily_quota_gb": 1,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after_unknown": {
+     "id": true,
+     "workspace_id": true,
+     "primary_shared_key": true
+    },
+    "before_sensitive": false,
+    "after_sensitive": {
+     "primary_shared_key": true
+    }
+   }
+  }
+ ]
+}

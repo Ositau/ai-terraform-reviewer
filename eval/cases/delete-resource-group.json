@@ -1,0 +1,30 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_resource_group.prod",
+   "mode": "managed",
+   "type": "azurerm_resource_group",
+   "name": "prod",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "delete"
+    ],
+    "before": {
+     "name": "rg-shop-prod",
+     "location": "uksouth",
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after": null,
+    "after_unknown": {},
+    "before_sensitive": {},
+    "after_sensitive": false
+   }
+  }
+ ]
+}

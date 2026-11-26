@@ -1,0 +1,75 @@
+# Azure DevOps step template: review a Terraform plan and comment on the pull request.
+#
+# Use it after the step that writes plan.json, in a job that runs for pull requests
+# (branch policy "Build validation"). The service connection must use workload identity
+# federation and its identity needs "Cognitive Services OpenAI User" on the Azure OpenAI resource.
+# For the comment, give the project's build service "Contribute to pull requests" on the repo.
+#
+#   - template: review-plan.yml@reviewer
+#     parameters:
+#       planJson: $(Build.SourcesDirectory)/plan.json
+#       serviceConnection: sc-my-connection
+#       openAiEndpoint: https://my-openai.openai.azure.com/
+
+parameters:
+  - name: planJson
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: openAiEndpoint
+    type: string
+  - name: openAiDeployment
+    type: string
+    default: gpt-4o-mini
+  - name: failOn
+    type: string
+    default: high
+    values: [medium, high, never]
+  - name: reviewerPath
+    type: string
+    default: $(Pipeline.Workspace)/reviewer   # where the reviewer repo is checked out
+
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: "3.12"
+
+  - script: pip install -q -r "${{ parameters.reviewerPath }}/requirements.txt"
+    displayName: Install reviewer
+
+  # Runs inside AzureCLI@2 so the stage references the service connection and gets a token
+  # (see https://ositauche.com/azure-devops-oidc-no-explicit-reference-service-connection/).
+  - task: AzureCLI@2
+    displayName: AI review of the Terraform plan
+    name: review
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+        export PYTHONPATH="${{ parameters.reviewerPath }}"
+        python -m reviewer "${{ parameters.planJson }}" --out review.md --json review.json --fail-on never > /dev/null
+        risk=$(python -c "import json;print(json.load(open('review.json'))['risk'])")
+        echo "##vso[task.setvariable variable=risk;isOutput=true]$risk"
+        echo "##vso[task.uploadsummary]$(pwd)/review.md"
+    env:
+      AZURE_OPENAI_ENDPOINT: ${{ parameters.openAiEndpoint }}
+      AZURE_OPENAI_DEPLOYMENT: ${{ parameters.openAiDeployment }}
+
+  - script: |
+      set -euo pipefail
+      python "${{ parameters.reviewerPath }}/azure-pipelines/post_pr_comment.py" review.md
+    displayName: Post the review on the pull request
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+  - script: |
+      order="low medium high"
+      rank() { i=0; for l in $order; do [ "$l" = "$1" ] && echo $i; i=$((i+1)); done; }
+      risk="$(review.risk)"
+      if [ "${{ parameters.failOn }}" = "never" ] || [ "$(rank "$risk")" -lt "$(rank "${{ parameters.failOn }}")" ]; then exit 0; fi
+      echo "##vso[task.logissue type=error]Plan risk is $risk. Read the review on the pull request before approving."
+      exit 1
+    displayName: Stop if the risk is too high

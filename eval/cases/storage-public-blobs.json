@@ -1,0 +1,51 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_storage_account.data",
+   "mode": "managed",
+   "type": "azurerm_storage_account",
+   "name": "data",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "update"
+    ],
+    "before": {
+     "name": "stshopprod01",
+     "resource_group_name": "rg-shop-prod",
+     "location": "uksouth",
+     "account_tier": "Standard",
+     "account_replication_type": "GRS",
+     "min_tls_version": "TLS1_2",
+     "allow_nested_items_to_be_public": false,
+     "shared_access_key_enabled": false,
+     "public_network_access_enabled": false,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after": {
+     "name": "stshopprod01",
+     "resource_group_name": "rg-shop-prod",
+     "location": "uksouth",
+     "account_tier": "Standard",
+     "account_replication_type": "GRS",
+     "min_tls_version": "TLS1_2",
+     "allow_nested_items_to_be_public": true,
+     "shared_access_key_enabled": false,
+     "public_network_access_enabled": true,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after_unknown": {},
+    "before_sensitive": {},
+    "after_sensitive": {}
+   }
+  }
+ ]
+}

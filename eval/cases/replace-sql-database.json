@@ -1,0 +1,46 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_mssql_database.orders",
+   "mode": "managed",
+   "type": "azurerm_mssql_database",
+   "name": "orders",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "delete",
+     "create"
+    ],
+    "before": {
+     "name": "sqldb-orders",
+     "server_id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-shop-prod/providers/Microsoft.Sql/servers/sql-shop-prod",
+     "sku_name": "S1",
+     "collation": "SQL_Latin1_General_CP1_CI_AS",
+     "max_size_gb": 50,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after": {
+     "name": "sqldb-orders",
+     "server_id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-shop-prod/providers/Microsoft.Sql/servers/sql-shop-prod",
+     "sku_name": "S1",
+     "collation": "Latin1_General_100_CI_AS_SC_UTF8",
+     "max_size_gb": 50,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after_unknown": {
+     "id": true
+    },
+    "before_sensitive": {},
+    "after_sensitive": {}
+   }
+  }
+ ]
+}

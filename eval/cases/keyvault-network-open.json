@@ -1,0 +1,53 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_key_vault.main",
+   "mode": "managed",
+   "type": "azurerm_key_vault",
+   "name": "main",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "update"
+    ],
+    "before": {
+     "name": "kv-shop-prod",
+     "sku_name": "standard",
+     "purge_protection_enabled": true,
+     "network_acls": [
+      {
+       "default_action": "Deny",
+       "bypass": "AzureServices",
+       "ip_rules": []
+      }
+     ],
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after": {
+     "name": "kv-shop-prod",
+     "sku_name": "standard",
+     "purge_protection_enabled": true,
+     "network_acls": [
+      {
+       "default_action": "Allow",
+       "bypass": "AzureServices",
+       "ip_rules": []
+      }
+     ],
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     }
+    },
+    "after_unknown": {},
+    "before_sensitive": {},
+    "after_sensitive": {}
+   }
+  }
+ ]
+}

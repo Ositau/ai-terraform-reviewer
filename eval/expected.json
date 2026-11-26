@@ -1,0 +1,130 @@
+{
+ "safe-tag-update": {
+  "min": "low",
+  "max": "low",
+  "must_flag": [],
+  "kind": "routine"
+ },
+ "safe-new-log-workspace": {
+  "min": "low",
+  "max": "low",
+  "must_flag": [],
+  "kind": "routine"
+ },
+ "safe-app-setting": {
+  "min": "low",
+  "max": "medium",
+  "must_flag": [],
+  "kind": "routine"
+ },
+ "safe-scale-out-small": {
+  "min": "low",
+  "max": "medium",
+  "must_flag": [],
+  "kind": "routine"
+ },
+ "delete-resource-group": {
+  "min": "high",
+  "max": "high",
+  "must_flag": [
+   "azurerm_resource_group.prod"
+  ],
+  "kind": "rule"
+ },
+ "replace-sql-database": {
+  "min": "high",
+  "max": "high",
+  "must_flag": [
+   "azurerm_mssql_database.orders"
+  ],
+  "kind": "rule"
+ },
+ "nsg-ssh-from-internet": {
+  "min": "high",
+  "max": "high",
+  "must_flag": [
+   "azurerm_network_security_rule.ssh"
+  ],
+  "kind": "rule"
+ },
+ "storage-public-blobs": {
+  "min": "high",
+  "max": "high",
+  "must_flag": [
+   "azurerm_storage_account.data"
+  ],
+  "kind": "rule"
+ },
+ "owner-on-subscription": {
+  "min": "high",
+  "max": "high",
+  "must_flag": [
+   "azurerm_role_assignment.ci"
+  ],
+  "kind": "rule"
+ },
+ "sql-firewall-open": {
+  "min": "high",
+  "max": "high",
+  "must_flag": [
+   "azurerm_mssql_firewall_rule.everyone"
+  ],
+  "kind": "rule"
+ },
+ "storage-old-tls": {
+  "min": "high",
+  "max": "high",
+  "must_flag": [
+   "azurerm_storage_account.data"
+  ],
+  "kind": "rule"
+ },
+ "vm-size-cost-jump": {
+  "min": "medium",
+  "max": "high",
+  "must_flag": [
+   "azurerm_linux_virtual_machine.api"
+  ],
+  "kind": "ai"
+ },
+ "webapp-https-off": {
+  "min": "medium",
+  "max": "high",
+  "must_flag": [
+   "azurerm_linux_web_app.shop"
+  ],
+  "kind": "ai"
+ },
+ "vm-password-login": {
+  "min": "medium",
+  "max": "high",
+  "must_flag": [
+   "azurerm_linux_virtual_machine.api"
+  ],
+  "kind": "ai"
+ },
+ "keyvault-network-open": {
+  "min": "medium",
+  "max": "high",
+  "must_flag": [
+   "azurerm_key_vault.main"
+  ],
+  "kind": "ai"
+ },
+ "webapp-ftp-on": {
+  "min": "medium",
+  "max": "high",
+  "must_flag": [
+   "azurerm_linux_web_app.shop"
+  ],
+  "kind": "ai"
+ },
+ "real-remove-from-hr-group": {
+  "min": "medium",
+  "max": "high",
+  "must_flag": [
+   "azuread_group_member.me[\"hr\"]"
+  ],
+  "kind": "ai"
+ }
+}

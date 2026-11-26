@@ -1,0 +1,57 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azurerm_linux_web_app.shop",
+   "mode": "managed",
+   "type": "azurerm_linux_web_app",
+   "name": "shop",
+   "provider_name": "registry.terraform.io/hashicorp/azurerm",
+   "change": {
+    "actions": [
+     "update"
+    ],
+    "before": {
+     "name": "app-shop-prod",
+     "resource_group_name": "rg-shop-prod",
+     "location": "uksouth",
+     "https_only": true,
+     "client_certificate_enabled": false,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     },
+     "site_config": [
+      {
+       "minimum_tls_version": "1.2",
+       "ftps_state": "Disabled",
+       "always_on": true
+      }
+     ]
+    },
+    "after": {
+     "name": "app-shop-prod",
+     "resource_group_name": "rg-shop-prod",
+     "location": "uksouth",
+     "https_only": true,
+     "client_certificate_enabled": false,
+     "tags": {
+      "environment": "prod",
+      "owner": "platform"
+     },
+     "site_config": [
+      {
+       "minimum_tls_version": "1.2",
+       "ftps_state": "AllAllowed",
+       "always_on": true
+      }
+     ]
+    },
+    "after_unknown": {},
+    "before_sensitive": {},
+    "after_sensitive": {}
+   }
+  }
+ ]
+}

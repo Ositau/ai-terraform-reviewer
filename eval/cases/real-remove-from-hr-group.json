@@ -1,0 +1,30 @@
+{
+ "format_version": "1.2",
+ "terraform_version": "1.14.7",
+ "resource_changes": [
+  {
+   "address": "azuread_group_member.me[\"hr\"]",
+   "mode": "managed",
+   "type": "azuread_group_member",
+   "name": "me",
+   "index": "hr",
+   "provider_name": "registry.terraform.io/hashicorp/azuread",
+   "change": {
+    "actions": [
+     "delete"
+    ],
+    "before": {
+     "group_object_id": "00000001-0000-0000-0000-000000000000",
+     "id": "00000001-0000-0000-0000-000000000000/member/00000002-0000-0000-0000-000000000000",
+     "member_object_id": "00000002-0000-0000-0000-000000000000",
+     "timeouts": null
+    },
+    "after": null,
+    "after_unknown": {},
+    "before_sensitive": {},
+    "after_sensitive": false
+   },
+   "action_reason": "delete_because_each_key"
+  }
+ ]
+}
